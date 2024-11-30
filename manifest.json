@@ -1,0 +1,27 @@
+{
+    "manifest_version": 3,
+    "name": "I Don't Want to Support",
+    "description": "Clicks I don't Want to Support or similar text. This quickly bypasses sites asking you to disable your ad blocker.",
+    "version": "0.0.0.2",
+    "icons": {
+      "16": "images/icon16.png",
+      "32": "images/icon32.png",
+      "64": "images/icon64.png",
+      "128": "images/icon128.png"
+    },
+    "action": {
+      "default_popup": "directions.html",
+      "default_icon": "icon.png"
+    },
+    "content_scripts": [
+        {
+          "js": ["dontsupport.js"],
+          "matches": [
+            "<all_urls>"
+          ]
+        }
+      ]
+    
+      
+    
+  }
