@@ -1,4 +1,4 @@
-# I Don't Want to SUpport
+# I Don't Want to Support
 
 <strong>chrome extension</strong><br>
 coming soon
