@@ -1,58 +1,37 @@
-texts = [
-    "I'll fix it next time",
-    "Continue without supporting this time",
-    "CONTINUE WITHOUT SUPPORTING THIS TIME",
-    "We rely on ads to keep this site free. Consider disabling your ad blocker.",
-    "I’ll do it later",
-    "Maybe next time",
-    "Continue without disabling",
-    "Continue without supporting us",
-    "Ignore and proceed",
-    "Remind me later",
-    "Continue with ad blocker",
-    "Proceed without support",
-    "No thanks, continue",
+(() => {
+  "use strict";
 
-]
-let elements = [];
-let counter = 0;
-function getElementsByText(str, tag = 'a') {
-    return Array.prototype.slice.call(document.getElementsByTagName(tag)).filter(el => el.textContent.trim() === str.trim());
-}
-time = setInterval(function () {
-    find()
-}, 250);
+  const explicitBypassPhrases = [
+    "i don't want to support",
+    "i do not want to support",
+    "continue without supporting this time",
+    "continue without supporting us",
+    "continue without disabling",
+    "continue with ad blocker",
+    "proceed without support"
+  ];
 
-function find() {
-    if (elements.length == 0) {
-        for (let i = 0; i < texts.length; i++) {
-            if (getElementsByText(texts[i], 'button').length == 0 && getElementsByText(texts[i], 'a').length == 0) {
+  const normalize = (text) => text.replace(/[’‘]/g, "'").replace(/\s+/g, " ").trim().toLowerCase();
 
-            }
-            if (getElementsByText(texts[i], 'button').length == 0 && getElementsByText(texts[i], 'a').length > 0) {
-                elements.push(getElementsByText(texts[i], 'a'));
-            }
-            if (getElementsByText(texts[i], 'button').length > 0 && getElementsByText(texts[i], 'a').length == 0) {
-                elements.push(getElementsByText(texts[i], 'button'));
-            }
-            if (getElementsByText(texts[i], 'button').length > 0 && getElementsByText(texts[i], 'a').length > 0) {
-                elements.push(getElementsByText(texts[i], 'button'));
-                elements.push(getElementsByText(texts[i], 'a'));
-            }
+  const isVisibleAndEnabled = (element) => {
+    const rect = element.getBoundingClientRect();
+    return !element.matches(":disabled") &&
+      element.getAttribute("aria-disabled")?.toLowerCase() !== "true" &&
+      element.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) &&
+      rect.width > 0 && rect.height > 0;
+  };
 
-        }
-        counter++;
-        if (counter >= 20) {
-            clearInterval(time)
-        }
+  const run = () => {
+    for (const element of document.querySelectorAll("button, a")) {
+      const label = normalize(element.innerText || element.textContent || "");
+      if (explicitBypassPhrases.includes(label) && isVisibleAndEnabled(element)) {
+        element.click();
+        return { status: "clicked", label: element.innerText || element.textContent || "" };
+      }
     }
-    else {
-        clickall()
+    return { status: "not-found" };
+  };
 
-    }
-}
-function clickall() {
-    for (let i = 0; i < elements.length; i++) {
-        elements[i][0].click()
-    }
-}
+  globalThis.IDontWantToSupport = { explicitBypassPhrases, normalize, run };
+  return run();
+})();
